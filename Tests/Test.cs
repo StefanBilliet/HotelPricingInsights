@@ -1,38 +1,24 @@
 using System.Text.Json;
 using AutoFixture;
-using Google.Api.Gax;
 using Google.Cloud.Bigtable.Admin.V2;
 using Google.Cloud.Bigtable.V2;
 using Google.Protobuf;
-using Testcontainers.Bigtable;
 
 namespace Tests;
 
-public sealed class BigtableIntegrationTests : IAsyncLifetime
+public sealed class BigtableIntegrationTests
 {
-    private readonly BigtableContainer _bigtableContainer;
     private readonly Fixture _fixture;
-    private const string InstanceId = "test-instance";
+    private readonly BigtableEmulatorFixture _bigtableEmulatorFixture;
+    private readonly BigtableClient _bigtableClient;
     private const string RatesTableId = "rates";
     private const string MariottGhentHotelId = "H101";
 
-    public BigtableIntegrationTests()
+    public BigtableIntegrationTests(BigtableEmulatorFixture bigtableEmulatorFixture)
     {
-        _bigtableContainer = new BigtableBuilder().Build();
+        _bigtableEmulatorFixture = bigtableEmulatorFixture;
+        _bigtableClient = bigtableEmulatorFixture.GetBigtableClient();
         _fixture = new Fixture();
-    }
-
-    public async ValueTask InitializeAsync()
-    {
-        await _bigtableContainer.StartAsync();
-
-        // Set environment variable for emulator
-        Environment.SetEnvironmentVariable("BIGTABLE_EMULATOR_HOST", _bigtableContainer.GetEmulatorEndpoint());
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _bigtableContainer.DisposeAsync();
     }
 
     [Fact]
@@ -40,24 +26,7 @@ public sealed class BigtableIntegrationTests : IAsyncLifetime
     {
         var arrival = new DateTimeOffset(2020, 2, 15, 0, 0, 0, TimeSpan.Zero);
 
-        // Build admin + data clients that must talk to the emulator
-        var admin = await new BigtableTableAdminClientBuilder
-        {
-            EmulatorDetection = EmulatorDetection.EmulatorOnly
-        }.BuildAsync(TestContext.Current.CancellationToken);
-
-        var bigtableClient = await new BigtableClientBuilder
-        {
-            EmulatorDetection = EmulatorDetection.EmulatorOnly
-        }.BuildAsync(TestContext.Current.CancellationToken);
-
-        var ratesTable = await admin.CreateTableAsync(
-            parent: InstanceId,
-            tableId: RatesTableId,
-            table: new Table
-            {
-                ColumnFamilies = { { RatesTableId, new ColumnFamily() } }
-            });
+        var ratesTable = await _bigtableEmulatorFixture.CreateTable(RatesTableId);
 
         var pricingExtractForMariottGhentExtractedOnJanuaryFirstForArrivalOnFebruaryFifteenth = _fixture
             .Build<PricingExtractForHotel>()
@@ -88,14 +57,14 @@ public sealed class BigtableIntegrationTests : IAsyncLifetime
                 _fixture.Build<PriceInfo>().With(price => price.PriceValue, 110).Create()
             ])
             .Create();
-        await SeedPricingExtract(bigtableClient, ratesTable, pricingExtractForMariottGhentExtractedOnJanuaryFirstForArrivalOnFebruaryFifteenth);
-        await SeedPricingExtract(bigtableClient, ratesTable, pricingExtractForMariottGhentExtractedOnJanuaryNinthForArrivalOnFebruaryFifteenth);
-        await SeedPricingExtract(bigtableClient, ratesTable, pricingExtractForCompletelyDifferentHotel);
+        await SeedPricingExtract(_bigtableClient, ratesTable, pricingExtractForMariottGhentExtractedOnJanuaryFirstForArrivalOnFebruaryFifteenth);
+        await SeedPricingExtract(_bigtableClient, ratesTable, pricingExtractForMariottGhentExtractedOnJanuaryNinthForArrivalOnFebruaryFifteenth);
+        await SeedPricingExtract(_bigtableClient, ratesTable, pricingExtractForCompletelyDifferentHotel);
 
 
         // Scan all rows for this hotel+arrival prefix, then pick the row with max extract date
         var pattern = $@"^{MariottGhentHotelId}#\d{{4}}-\d{{2}}-\d{{2}}#{arrival:yyyy-MM-dd}$";
-        var rows = bigtableClient.ReadRows(new ReadRowsRequest
+        var rows = _bigtableClient.ReadRows(new ReadRowsRequest
         {
             TableName = ratesTable.Name,
             Filter = RowFilters.RowKeyRegex(pattern)
@@ -127,7 +96,7 @@ public sealed class BigtableIntegrationTests : IAsyncLifetime
         Assert.Equal(110.00m, lowestPrice);
     }
 
-    private async Task SeedPricingExtract(BigtableClient bigtableClient, Table table, PricingExtractForHotel pricingExtract)
+    private static async Task SeedPricingExtract(BigtableClient bigtableClient, Table table, PricingExtractForHotel pricingExtract)
     {
         var rowKey = $"{pricingExtract.OurHotelId}#{DateTimeOffset.FromUnixTimeSeconds(pricingExtract.ExtractDate):yyyy-MM-dd}#{DateTimeOffset.FromUnixTimeSeconds(pricingExtract.ArrivalDate):yyyy-MM-dd}";
         var mutation = Mutations.SetCell(

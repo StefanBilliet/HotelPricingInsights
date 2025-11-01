@@ -3,6 +3,7 @@ using AutoFixture;
 using Google.Cloud.Bigtable.Admin.V2;
 using Google.Cloud.Bigtable.V2;
 using Google.Protobuf;
+using Tests.Infrastructure;
 
 namespace Tests;
 

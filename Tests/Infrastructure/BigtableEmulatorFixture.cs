@@ -3,7 +3,7 @@ using Google.Cloud.Bigtable.Admin.V2;
 using Google.Cloud.Bigtable.V2;
 using Testcontainers.Bigtable;
 
-namespace Tests;
+namespace Tests.Infrastructure;
 
 public sealed class BigtableEmulatorFixture : IAsyncLifetime
 {

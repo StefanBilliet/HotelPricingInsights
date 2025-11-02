@@ -44,14 +44,14 @@ public sealed class BigtableEmulatorFixture : IAsyncLifetime
         await _bigtableContainer.DisposeAsync();
     }
 
-    public Task<Table> CreateTable(string tableId)
+    public Task<Table> CreateTable(string tableId, string columnFamily)
     {
         return _admin.CreateTableAsync(
             parent: InstanceId,
             tableId: tableId,
             table: new Table
             {
-                ColumnFamilies = { { tableId, new ColumnFamily() } }
+                ColumnFamilies = { { columnFamily, new ColumnFamily() } }
             });
     }
 }

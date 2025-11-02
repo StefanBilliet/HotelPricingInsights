@@ -12,7 +12,7 @@ public sealed class BigtableIntegrationTests
     private readonly Fixture _fixture;
     private readonly BigtableEmulatorFixture _bigtableEmulatorFixture;
     private readonly BigtableClient _bigtableClient;
-    private const string RatesTableId = "rates";
+    private const string RatesTableId = "hotel_rates";
     private const string MariottGhentHotelId = "H101";
 
     public BigtableIntegrationTests(BigtableEmulatorFixture bigtableEmulatorFixture)
@@ -27,7 +27,7 @@ public sealed class BigtableIntegrationTests
     {
         var arrival = new DateTimeOffset(2020, 2, 15, 0, 0, 0, TimeSpan.Zero);
 
-        var ratesTable = await _bigtableEmulatorFixture.CreateTable(RatesTableId);
+        var ratesTable = await _bigtableEmulatorFixture.CreateTable(RatesTableId, "rates");
 
         var pricingExtractForMariottGhentExtractedOnJanuaryFirstForArrivalOnFebruaryFifteenth = _fixture
             .Build<PricingExtractForHotel>()

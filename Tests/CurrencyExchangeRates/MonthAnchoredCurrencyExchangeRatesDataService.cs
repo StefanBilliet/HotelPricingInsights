@@ -3,7 +3,12 @@ using Dapper;
 
 namespace Tests.CurrencyExchangeRates;
 
-public class MonthAnchoredCurrencyExchangeRatesDataService
+public interface ICurrencyExchangeRatesDataService
+{
+    Task<CurrencyExchangeRate?> GetForCurrency(string currency, DateOnly monthAnchor, CancellationToken cancellationToken);
+}
+
+public class MonthAnchoredCurrencyExchangeRatesDataService : ICurrencyExchangeRatesDataService
 {
     private readonly Func<IDbConnection> _dbConnectionFactory;
 

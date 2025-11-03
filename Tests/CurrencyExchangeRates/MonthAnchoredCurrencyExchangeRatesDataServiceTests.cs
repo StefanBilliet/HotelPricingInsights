@@ -11,11 +11,10 @@ public class MonthAnchoredCurrencyExchangeRatesDataServiceTests
     private readonly Func<IDbConnection> _dbConnectionFactory;
     private readonly Fixture _fixture;
 
+
     public MonthAnchoredCurrencyExchangeRatesDataServiceTests(PostgresFixture postgresFixture)
     {
-        _fixture = new Fixture();
-        //Otherwise AutoFixture will try to generate DateOnly with invalid values
-        _fixture.Customize<DateOnly>(customization => customization.FromFactory<DateTime>(dateTime => DateOnly.FromDateTime(dateTime.Date)));
+        _fixture = AutoFixtureFactory.Instance;
         _dbConnectionFactory = postgresFixture.GetConnectionFactory();
         _sut = new MonthAnchoredCurrencyExchangeRatesDataService(_dbConnectionFactory);
     }

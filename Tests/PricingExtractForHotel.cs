@@ -24,7 +24,7 @@ public record PriceInfo(
     int MealTypeIncluded,
     int OtherTaxesIncl,
     string PriceId,
-    int PriceValue,
+    decimal PriceValue,
     string RoomName,
     int VatIncl
 );

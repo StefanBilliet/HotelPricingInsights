@@ -11,6 +11,7 @@
         <PackageReference Include="AutoFixture.Xunit3" Version="4.19.0" />
         <PackageReference Include="coverlet.collector" Version="6.0.2"/>
         <PackageReference Include="Dapper" Version="2.1.66" />
+        <PackageReference Include="FakeItEasy" Version="8.3.0" />
         <PackageReference Include="Google.Cloud.Bigtable.Admin.V2" Version="3.29.0" />
         <PackageReference Include="Google.Cloud.Bigtable.V2" Version="3.24.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>

@@ -20,26 +20,9 @@ The runtime is an ASP.NET Core Web API targeting .NET 9.0. The main pipeline con
 
 All services are wired through `ServiceCollectionExtensions.AddPricingComparisonServices`, which is exercised in unit tests to validate dependency composition.
 
-## Project Layout
+## Documentation
 
-```
-├── HotelPricingInsights/          # ASP.NET Core application
-│   ├── Controllers/
-│   │   └── PricingComparisonEndpoint.cs
-│   ├── Controllers/HotelPriceComparison/
-│   │   ├── HotelPriceComparisonService.cs
-│   │   ├── PricingExtractsForHotelsInSpecificPeriod/
-│   │   └── CurrencyExchangeRates/
-│   └── ServiceCollectionExtensions.cs
-├── Tests/                         # xUnit test project
-│   ├── Web/…                      # Unit tests for endpoints & services
-│   └── CurrencyExchangeRates/…    # Tests for caching behaviour
-├── docs/
-│   ├── EXTERNAL_openapi_(4).yml   # OpenAPI contract
-│   ├── sequence-diagram.mmd       # Mermaid sequence diagram
-│   └── EXTERNAL_2025_case_…pdf    # Exercise briefing
-└── .github/workflows/dotnet.yml   # CI pipeline
-```
+- Sequence diagram: [docs/sequence-diagram.mmd](docs/sequence-diagram.mmd)
 
 ## Getting Started
 

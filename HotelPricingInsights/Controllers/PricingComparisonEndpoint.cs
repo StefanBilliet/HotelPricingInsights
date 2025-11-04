@@ -6,20 +6,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace HotelPricingInsights.Controllers;
 
 [ApiController]
-[Route("pricing/pre_corona_difference")]
-public class PricingComparisonController : ControllerBase
+[Route("api")]
+public class PricingComparisonEndpoint : ControllerBase
 {
     private readonly IValidator<PricingComparisonRequest> _validator;
     private readonly IHotelPricingComparisonService _service;
 
-    public PricingComparisonController(IValidator<PricingComparisonRequest> validator,
+    public PricingComparisonEndpoint(IValidator<PricingComparisonRequest> validator,
         IHotelPricingComparisonService service)
     {
         _validator = validator;
         _service = service;
     }
 
-    [HttpGet]
+    [HttpGet("pricing/pre_corona_difference")]
     public async Task<ActionResult<PricingComparisonResponse>> GetPreCoronaDifference(
         [FromQuery] PricingComparisonRequest request,
         CancellationToken cancellationToken)
@@ -43,5 +43,4 @@ public class PricingComparisonController : ControllerBase
 
         return Ok(comparison);
     }
-
 }

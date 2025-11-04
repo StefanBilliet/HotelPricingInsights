@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
         });
         services.AddScoped<IPricingExtractsForHotelsInSpecificPeriodDataService, PricingExtractsForHotelsInSpecificPeriodDataService>();
         services.AddTransient<IValidator<PricingComparisonRequest>, PricingComparisonRequestValidator>();
-        services.AddTransient<PricingComparisonController>();
+        services.AddTransient<PricingComparisonEndpoint>();
 
         services.TryAddSingleton<BigtableClient>(_ => throw new InvalidOperationException("Configure a BigtableClient instance via dependency injection."));
         services.TryAddSingleton<Table>(_ => new Table { Name = TableName.FromProjectInstanceTable("project", "instance", "pricing").ToString() });

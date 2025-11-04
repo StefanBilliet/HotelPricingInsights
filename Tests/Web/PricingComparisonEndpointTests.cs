@@ -8,17 +8,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Tests.Web;
 
-public class PricingComparisonControllerTests
+public class PricingComparisonEndpointTests
 {
     private readonly IHotelPricingComparisonService _service;
-    private readonly PricingComparisonController _controller;
+    private readonly PricingComparisonEndpoint _endpoint;
     private readonly IValidator<PricingComparisonRequest> _validator;
 
-    public PricingComparisonControllerTests()
+    public PricingComparisonEndpointTests()
     {
         _service = A.Fake<IHotelPricingComparisonService>();
         _validator = A.Fake<IValidator<PricingComparisonRequest>>();
-        _controller = new PricingComparisonController(_validator, _service);
+        _endpoint = new PricingComparisonEndpoint(_validator, _service);
         A.CallTo(() => _validator.ValidateAsync(A<PricingComparisonRequest>._, A<CancellationToken>._)).Returns(new ValidationResult());
     }
 
@@ -27,7 +27,7 @@ public class PricingComparisonControllerTests
     {
         A.CallTo(() => _validator.ValidateAsync(invalidRequest, A<CancellationToken>._)).Returns(new ValidationResult { Errors = [new ValidationFailure("Month", "Month is wrong")] });
         
-        var result = await _controller.GetPreCoronaDifference(invalidRequest, TestContext.Current.CancellationToken);
+        var result = await _endpoint.GetPreCoronaDifference(invalidRequest, TestContext.Current.CancellationToken);
         
         Assert.IsType<BadRequestObjectResult>(result.Result);
     }
@@ -60,7 +60,7 @@ public class PricingComparisonControllerTests
                 "USD",
                 A<CancellationToken>._)).Returns(expectedResponse);
 
-        var result = await _controller.GetPreCoronaDifference(request, CancellationToken.None);
+        var result = await _endpoint.GetPreCoronaDifference(request, CancellationToken.None);
 
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Equal(expectedResponse, okResult.Value);

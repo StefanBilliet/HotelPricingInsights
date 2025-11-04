@@ -33,7 +33,7 @@ public class CompositionTests
         });
 
         using var scope = provider.CreateScope();
-        var controller = scope.ServiceProvider.GetRequiredService<PricingComparisonController>();
+        var controller = scope.ServiceProvider.GetRequiredService<PricingComparisonEndpoint>();
 
         Assert.NotNull(controller);
     }

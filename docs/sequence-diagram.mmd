@@ -1,0 +1,53 @@
+sequenceDiagram
+participant Client
+participant Kestrel as ASP.NET Core Host (Kestrel)
+participant Middleware as Middleware Pipeline
+participant Routing as Endpoint Routing
+participant Endpoint as PricingComparisonEndpoint (/pricing/pre_corona_difference)
+participant Service as HotelPricingComparisonService
+participant ExtractSvc as PricingExtractsForHotelsInSpecificPeriodDataService
+participant CurrencySvc as CurrencyConverter
+participant CachingRates as CachingCurrencyExchangeRatesDataService
+participant RatesSvc as MonthAnchoredCurrencyExchangeRatesDataService
+participant CachePolicy as AsyncCachePolicy
+participant Bigtable as BigtableClient
+participant DbFactory as IDbConnection Factory
+participant Database as Database
+participant Telemetry as OpenTelemetry
+
+      Client->>Kestrel: HTTP GET /pricing/pre_corona_difference
+      Kestrel->>Middleware: Forward request
+      Middleware->>Middleware: UseHttpsRedirection
+      Middleware->>Routing: Endpoint routing
+      Routing->>Endpoint: Bind query params + FluentValidation
+      Endpoint->>Telemetry: ASP.NET Core instrumentation logs/span
+      Endpoint->>Service: GetPricingComparison(request)
+
+      Service->>ExtractSvc: Fetch current window extracts
+      ExtractSvc->>Bigtable: ReadRows(current)
+      Bigtable-->>ExtractSvc: Current extracts
+
+      Service->>ExtractSvc: Fetch historical window extracts
+      ExtractSvc->>Bigtable: ReadRows(historical)
+      Bigtable-->>ExtractSvc: Historical extracts
+
+      Service->>CurrencySvc: ConvertPrice(...)
+      CurrencySvc->>CachingRates: GetForCurrency(...)
+      CachingRates->>CachePolicy: ExecuteAsync(cache key)
+      CachePolicy-->>CachingRates: Cached value?
+      alt Cache miss
+          CachingRates->>RatesSvc: GetForCurrency(...)
+          RatesSvc->>DbFactory: Create connection
+          DbFactory->>Database: Query exchange_rates
+          Database-->>RatesSvc: CurrencyExchangeRate
+          RatesSvc-->>CachingRates: Result
+          CachingRates->>CachePolicy: Store in cache
+      end
+      CachePolicy-->>CachingRates: Result (cached or fresh)
+      CachingRates-->>CurrencySvc: Conversion rate
+      CurrencySvc-->>Service: Converted price
+
+      Service-->>Endpoint: PricingComparisonResponse
+      Endpoint-->>Client: 200 OK (JSON)
+      Endpoint->>Telemetry: Record response status & duration
+      Telemetry->>OTLP: Export logs/traces/metrics to http://localhost:4317

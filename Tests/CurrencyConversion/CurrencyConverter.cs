@@ -2,7 +2,16 @@ using Tests.CurrencyExchangeRates;
 
 namespace Tests.CurrencyConversion;
 
-public class CurrencyConverter
+public interface ICurrencyConverter
+{
+    Task<PriceInfo?> ConvertPrice(
+        PriceInfo price,
+        string targetCurrency,
+        DateOnly monthAnchor,
+        CancellationToken cancellationToken);
+}
+
+public class CurrencyConverter : ICurrencyConverter
 {
     private readonly ICurrencyExchangeRatesDataService _exchangeRatesService;
 

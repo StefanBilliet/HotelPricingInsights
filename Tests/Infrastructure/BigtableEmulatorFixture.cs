@@ -8,8 +8,8 @@ namespace Tests.Infrastructure;
 public sealed class BigtableEmulatorFixture : IAsyncLifetime
 {
     private readonly BigtableContainer _bigtableContainer;
-    private BigtableTableAdminClient _admin;
-    private BigtableClient _bigtableClient;
+    private BigtableTableAdminClient _admin = null!;
+    private BigtableClient _bigtableClient = null!;
     private const string InstanceId = "test-instance";
 
     public BigtableEmulatorFixture()

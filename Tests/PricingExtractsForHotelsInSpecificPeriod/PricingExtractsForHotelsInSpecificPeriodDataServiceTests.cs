@@ -13,8 +13,8 @@ public sealed class PricingExtractsForHotelsInSpecificPeriodDataServiceTests : I
     private readonly Fixture _fixture;
     private readonly BigtableEmulatorFixture _bigtableEmulatorFixture;
     private readonly BigtableClient _bigtableClient;
-    private PricingExtractsForHotelsInSpecificPeriodDataService _sut;
-    private Table _ratesTable;
+    private PricingExtractsForHotelsInSpecificPeriodDataService _sut = null!;
+    private Table _ratesTable = null!;
     private const string RatesTableId = "hotel_rates";
     private const string MariottGhentHotelId = "H101";
 

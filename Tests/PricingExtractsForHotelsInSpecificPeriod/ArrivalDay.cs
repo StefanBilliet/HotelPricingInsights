@@ -4,19 +4,22 @@ namespace Tests.PricingExtractsForHotelsInSpecificPeriod;
 
 public readonly struct ArrivalDay
 {
-    public int DayIndex { get; }
+    public int DaysSinceEpoch { get; }
 
-    public ArrivalDay(int dayIndex)
+    public ArrivalDay(int daysSinceEpoch)
     {
-        DayIndex = dayIndex;
+        DaysSinceEpoch = daysSinceEpoch;
     }
 
     public DateOnly ToDateOnly() =>
-        DateOnly.FromDayNumber(DayIndex);
-
-    public string ToKeyString() =>
-        ToDateOnly().ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        DateOnly.FromDateTime(DateTimeOffset.UnixEpoch.AddDays(DaysSinceEpoch).UtcDateTime);
 
     public static ArrivalDay FromDateOnly(DateOnly date) =>
         new ArrivalDay((int)(date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc) - DateTime.UnixEpoch).TotalDays);
+    
+    public static ArrivalDay From(DateTimeOffset dateTimeOffset)
+    {
+        var utcDateTime = dateTimeOffset.UtcDateTime;
+        return new ArrivalDay((int)(utcDateTime - DateTime.UnixEpoch).TotalDays);
+    }
 }

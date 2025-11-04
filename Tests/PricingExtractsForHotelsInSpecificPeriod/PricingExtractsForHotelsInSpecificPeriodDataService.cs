@@ -6,7 +6,15 @@ using Google.Protobuf;
 
 namespace Tests.PricingExtractsForHotelsInSpecificPeriod;
 
-public class PricingExtractsForHotelsInSpecificPeriodDataService
+public interface IPricingExtractsForHotelsInSpecificPeriodDataService
+{
+    Task<IReadOnlyList<PricingExtractForHotel>> Get(IReadOnlyCollection<string> hotelIds,
+        DateOnly monthOfArrivalDates,
+        ExtractWindow extractWindow,
+        CancellationToken cancellationToken);
+}
+
+public class PricingExtractsForHotelsInSpecificPeriodDataService : IPricingExtractsForHotelsInSpecificPeriodDataService
 {
     private readonly BigtableClient _bigtableClient;
     private readonly Table _ratesTable;
@@ -22,8 +30,8 @@ public class PricingExtractsForHotelsInSpecificPeriodDataService
         ExtractWindow extractWindow,
         CancellationToken cancellationToken)
     {
-        var monthStartIndex = ArrivalDay.FromDateOnly(monthOfArrivalDates).DayIndex;
-        var monthEndIndex = ArrivalDay.FromDateOnly(monthOfArrivalDates.AddMonths(1)).DayIndex;
+        var monthStartIndex = ArrivalDay.FromDateOnly(monthOfArrivalDates).DaysSinceEpoch;
+        var monthEndIndex = ArrivalDay.FromDateOnly(monthOfArrivalDates.AddMonths(1)).DaysSinceEpoch;
 
         var ranges = new RowSet();
         foreach (var id in hotelIds)

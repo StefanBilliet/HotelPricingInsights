@@ -1,13 +1,10 @@
-using FluentValidation;
-using HotelPricingInsights.Controllers;
-using HotelPricingInsights.Controllers.HotelPriceComparison;
+using HotelPricingInsights;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<IHotelPricingComparisonService, HotelPricingComparisonService>();
-builder.Services.AddTransient<IValidator<PricingComparisonRequest>, PricingComparisonRequestValidator>();
+builder.Services.AddPricingComparisonServices();
 
 var app = builder.Build();
 

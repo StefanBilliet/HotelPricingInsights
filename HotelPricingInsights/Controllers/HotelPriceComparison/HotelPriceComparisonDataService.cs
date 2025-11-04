@@ -10,6 +10,7 @@ public interface IHotelPricingComparisonService
         DateOnly arrivalMonth,
         int yearsAgo,
         string targetCurrency,
+        bool? cancellableOnly,
         CancellationToken cancellationToken);
 }
 
@@ -30,6 +31,7 @@ public class HotelPricingComparisonService : IHotelPricingComparisonService
         DateOnly arrivalMonth,
         int yearsAgo,
         string targetCurrency,
+        bool? cancellableOnly,
         CancellationToken cancellationToken)
     {
         var currentWindow = ExtractWindow.ForArrivalMonth(arrivalMonth);
@@ -43,8 +45,8 @@ public class HotelPricingComparisonService : IHotelPricingComparisonService
         await Task.WhenAll(currentTask, historicalTask);
 
         // Process extracts
-        var currentPrices = await GetLowestPricePerHotelAndArrivalDate(currentTask.Result, arrivalMonth, targetCurrency, cancellationToken);
-        var historicalPrices = await GetLowestPricePerHotelAndArrivalDate(historicalTask.Result, historicalMonth, targetCurrency, cancellationToken);
+        var currentPrices = await GetLowestPricePerHotelAndArrivalDate(currentTask.Result, arrivalMonth, targetCurrency, cancellableOnly, cancellationToken);
+        var historicalPrices = await GetLowestPricePerHotelAndArrivalDate(historicalTask.Result, historicalMonth, targetCurrency, cancellableOnly, cancellationToken);
 
         return new PricingComparisonResponse
         {
@@ -60,11 +62,12 @@ public class HotelPricingComparisonService : IHotelPricingComparisonService
         IReadOnlyList<PricingExtractForHotel> extracts,
         DateOnly monthAnchor,
         string targetCurrency,
+        bool? cancellableOnly,
         CancellationToken cancellationToken)
     {
         var pricesByArrival = new Dictionary<HotelArrivalKey, ExtractPriceSnapshot>();
 
-        var extractsWithNormalisedPrices = await ExtractsWithNormalisedPrices(extracts, monthAnchor, cancellationToken);
+        var extractsWithNormalisedPrices = await ExtractsWithNormalisedPrices(extracts, monthAnchor, cancellableOnly, cancellationToken);
 
         foreach (var extract in extractsWithNormalisedPrices.Where(extract => extract.Prices.Count > 0))
         {
@@ -92,23 +95,32 @@ public class HotelPricingComparisonService : IHotelPricingComparisonService
     }
 
     private async Task<IReadOnlyCollection<PricingExtractForHotel>> ExtractsWithNormalisedPrices(IReadOnlyCollection<PricingExtractForHotel> extractPrices,
-        DateOnly monthAnchor, CancellationToken cancellationToken)
+        DateOnly monthAnchor,
+        bool? cancellableOnly,
+        CancellationToken cancellationToken)
     {
         var extractsWithNormalisedPrices = new List<PricingExtractForHotel>();
         foreach (var extract in extractPrices)
         {
-            var normalisedPrices = await NormalisePrices(extract.Prices, monthAnchor, cancellationToken).ToArrayAsync(cancellationToken: cancellationToken);
+            var normalisedPrices = await NormalisePrices(extract.Prices, monthAnchor, cancellableOnly, cancellationToken)
+                .ToArrayAsync(cancellationToken: cancellationToken);
             extractsWithNormalisedPrices.Add(extract with { Prices = normalisedPrices });
         }
 
         return extractsWithNormalisedPrices;
     }
 
-    private async IAsyncEnumerable<PriceInfo> NormalisePrices(IReadOnlyCollection<PriceInfo> extractPrices, DateOnly monthAnchor,
+    private async IAsyncEnumerable<PriceInfo> NormalisePrices(IReadOnlyCollection<PriceInfo> extractPrices,
+        DateOnly monthAnchor,
+        bool? cancellableOnly,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         foreach (var price in extractPrices)
         {
+            if (cancellableOnly.GetValueOrDefault() && !price.IsCancellable)
+            {
+                continue;
+            }
             var normalisedPrice = await _currencyConverter.ConvertPrice(price, "USD", monthAnchor, cancellationToken);
             if (normalisedPrice == null)
             {

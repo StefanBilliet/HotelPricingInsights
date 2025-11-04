@@ -39,6 +39,7 @@ public class PricingComparisonEndpoint : ControllerBase
             arrivalMonth,
             request.YearsAgo,
             request.Currency,
+            request.Cancellable,
             cancellationToken);
 
         return Ok(comparison);

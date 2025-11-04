@@ -58,6 +58,7 @@ public class PricingComparisonEndpointTests
                 new DateOnly(2024, 5, 1),
                 4,
                 "USD",
+                false,
                 A<CancellationToken>._)).Returns(expectedResponse);
 
         var result = await _endpoint.GetPreCoronaDifference(request, CancellationToken.None);
@@ -69,6 +70,7 @@ public class PricingComparisonEndpointTests
                 new DateOnly(2024, 5, 1),
                 4,
                 "USD",
+                false,
                 A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }

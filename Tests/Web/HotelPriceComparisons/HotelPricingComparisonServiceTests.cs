@@ -12,16 +12,15 @@ public class HotelPricingComparisonServiceTests
 {
     private readonly HotelPricingComparisonService _sut;
     private readonly IPricingExtractsForHotelsInSpecificPeriodDataService _pricingExtractsForHotelsInSpecificPeriodDataService;
-    private readonly ICurrencyConverter _currencyConverter;
     private readonly Fixture _fixture;
 
     public HotelPricingComparisonServiceTests()
     {
         _pricingExtractsForHotelsInSpecificPeriodDataService = A.Fake<IPricingExtractsForHotelsInSpecificPeriodDataService>();
-        _currencyConverter = A.Fake<ICurrencyConverter>();
-        _sut = new HotelPricingComparisonService(_pricingExtractsForHotelsInSpecificPeriodDataService, _currencyConverter);
+        var passThroughCurrencyConverter = A.Fake<ICurrencyConverter>();
+        _sut = new HotelPricingComparisonService(_pricingExtractsForHotelsInSpecificPeriodDataService, passThroughCurrencyConverter);
         _fixture = AutoFixtureFactory.Instance;
-        A.CallTo(() => _currencyConverter.ConvertPrice(A<PriceInfo>._, "USD", A<DateOnly>._, A<CancellationToken>._))
+        A.CallTo(() => passThroughCurrencyConverter.ConvertPrice(A<PriceInfo>._, "USD", A<DateOnly>._, A<CancellationToken>._))
             .ReturnsLazily(fakedCall => Task.FromResult(fakedCall.GetArgument<PriceInfo>(0)));
     }
 
@@ -32,7 +31,8 @@ public class HotelPricingComparisonServiceTests
             [123],
             DateOnly.FromDateTime(DateTime.Today),
             4,
-            "USD", 
+            "USD",
+            false,
             TestContext.Current.CancellationToken
         );
 
@@ -63,6 +63,7 @@ public class HotelPricingComparisonServiceTests
             arrivalMonth,
             4,
             "USD",
+            false,
             TestContext.Current.CancellationToken
         );
 
@@ -141,6 +142,7 @@ public class HotelPricingComparisonServiceTests
             arrivalMonth,
             4,
             "USD",
+            false,
             TestContext.Current.CancellationToken
         );
 
@@ -154,5 +156,45 @@ public class HotelPricingComparisonServiceTests
                 Hotel = pricingExtractForMariottGhentExtractedOnJanuaryFirstForArrivalOnFebruaryFifteenth.OurHotelId,
                 Difference = 5m
             }, price);
+    }
+
+    [Fact]
+    public async Task GIVEN_cancellable_only_WHEN_lower_price_is_not_cancellable_THEN_filters_non_cancellable_prices()
+    {
+        var arrival = new DateTimeOffset(2020, 3, 20, 0, 0, 0, TimeSpan.Zero);
+        var cancellablePrice = _fixture.Build<PriceInfo>()
+            .With(price => price.PriceValue, 120m)
+            .With(price => price.IsCancellable, true)
+            .Create();
+        var nonCancellablePrice = _fixture.Build<PriceInfo>()
+            .With(price => price.PriceValue, 90m)
+            .With(price => price.IsCancellable, false)
+            .Create();
+        var extract = _fixture.Build<PricingExtractForHotel>()
+            .With(extract => extract.ExtractDate, new DateTimeOffset(2020, 2, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds())
+            .With(extract => extract.ArrivalDate, ArrivalDay.From(arrival).DaysSinceEpoch)
+            .With(extract => extract.Prices, [cancellablePrice, nonCancellablePrice])
+            .Create();
+        var hotelIds = new[] { extract.OurHotelId };
+        var arrivalMonth = DateOnly.FromDateTime(arrival.DateTime);
+        A.CallTo(() => _pricingExtractsForHotelsInSpecificPeriodDataService.Get(hotelIds, arrivalMonth, ExtractWindow.ForArrivalMonth(arrivalMonth),
+                TestContext.Current.CancellationToken))
+            .Returns([extract]);
+        A.CallTo(() => _pricingExtractsForHotelsInSpecificPeriodDataService.Get(hotelIds, arrivalMonth.AddYears(-4), ExtractWindow.ForArrivalMonth(arrivalMonth.AddYears(-4)),
+                TestContext.Current.CancellationToken))
+            .Returns([]);
+
+        var result = await _sut.GetPricingComparison(
+            hotelIds,
+            arrivalMonth,
+            4,
+            "USD",
+            true,
+            TestContext.Current.CancellationToken
+        );
+
+        var price = Assert.Single(result.Prices);
+        Assert.Equal(120m, price.Price);
+        Assert.Equal("2020-03-20", price.ArrivalDate);
     }
 }

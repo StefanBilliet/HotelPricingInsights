@@ -1,10 +1,19 @@
 using System.Runtime.CompilerServices;
-using Tests.CurrencyConversion;
-using Tests.PricingExtractsForHotelsInSpecificPeriod;
+using HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyConversion;
+using HotelPricingInsights.Controllers.HotelPriceComparison.PricingExtractsForHotelsInSpecificPeriod;
 
-namespace Tests.HotelPriceComparisons;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison;
 
-public class HotelPricingComparisonService
+public interface IHotelPricingComparisonService
+{
+    Task<PricingComparisonResponse> GetPricingComparison(int[] hotelIds,
+        DateOnly arrivalMonth,
+        int yearsAgo,
+        string targetCurrency,
+        CancellationToken cancellationToken);
+}
+
+public class HotelPricingComparisonService : IHotelPricingComparisonService
 {
     private readonly ICurrencyConverter _currencyConverter;
     private readonly IPricingExtractsForHotelsInSpecificPeriodDataService _pricingExtractsForHotelsInSpecificPeriodDataService;
@@ -17,8 +26,7 @@ public class HotelPricingComparisonService
         _currencyConverter = currencyConverter;
     }
 
-    public async Task<PricingComparisonResponse> GetPricingComparison(
-        string[] hotelIds,
+    public async Task<PricingComparisonResponse> GetPricingComparison(int[] hotelIds,
         DateOnly arrivalMonth,
         int yearsAgo,
         string targetCurrency,
@@ -44,7 +52,7 @@ public class HotelPricingComparisonService
         };
     }
 
-    private readonly record struct HotelArrivalKey(string HotelId, ArrivalDay ArrivalDay);
+    private readonly record struct HotelArrivalKey(int HotelId, ArrivalDay ArrivalDay);
 
     private readonly record struct ExtractPriceSnapshot(decimal Price, int ExtractDate);
 

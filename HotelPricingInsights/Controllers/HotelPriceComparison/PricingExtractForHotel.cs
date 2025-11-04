@@ -1,4 +1,4 @@
-namespace Tests;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison;
 
 public record PricingExtractForHotel(
     int ExtractDate,
@@ -6,7 +6,7 @@ public record PricingExtractForHotel(
     int ArrivalDate,
     int LengthOfStay,
     int OnlineTravelAgencyId,
-    string OurHotelId,
+    int OurHotelId,
     string PointOfSale,
     IReadOnlyCollection<PriceInfo> Prices
 );

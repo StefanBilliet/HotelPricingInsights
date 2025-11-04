@@ -1,4 +1,4 @@
-namespace Tests.CurrencyExchangeRates;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyExchangeRates;
 
 public readonly record struct CurrencyExchangeRate(
     string Currency,      

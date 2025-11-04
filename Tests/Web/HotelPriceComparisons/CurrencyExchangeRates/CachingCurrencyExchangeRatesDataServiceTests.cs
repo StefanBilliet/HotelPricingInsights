@@ -1,8 +1,9 @@
 using FakeItEasy;
+using HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyExchangeRates;
 using Polly;
 using Tests.Infrastructure;
 
-namespace Tests.CurrencyExchangeRates;
+namespace Tests.Web.HotelPriceComparisons.CurrencyExchangeRates;
 
 public class CachingCurrencyExchangeRatesDataServiceTests
 {

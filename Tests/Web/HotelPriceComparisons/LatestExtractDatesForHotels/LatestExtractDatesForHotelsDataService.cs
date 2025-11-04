@@ -2,7 +2,7 @@ using Google.Api.Gax;
 using Google.Cloud.Bigtable.Common.V2;
 using Google.Cloud.Bigtable.V2;
 
-namespace Tests.LatestExtractDatesForHotels;
+namespace Tests.Web.HotelPriceComparisons.LatestExtractDatesForHotels;
 
 public class LatestExtractDatesForHotelsDataService
 {

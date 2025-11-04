@@ -1,4 +1,6 @@
-namespace Tests.PricingExtractsForHotelsInSpecificPeriod;
+using HotelPricingInsights.Controllers.HotelPriceComparison;
+
+namespace Tests.Web.HotelPriceComparisons.PricingExtractsForHotelsInSpecificPeriod;
 
 public class ExtractWindowTests
 {

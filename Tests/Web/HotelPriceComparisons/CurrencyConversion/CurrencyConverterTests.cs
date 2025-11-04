@@ -1,10 +1,12 @@
 using AutoFixture;
 using AutoFixture.Xunit3;
 using FakeItEasy;
-using Tests.CurrencyExchangeRates;
+using HotelPricingInsights.Controllers.HotelPriceComparison;
+using HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyConversion;
+using HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyExchangeRates;
 using Tests.Infrastructure;
 
-namespace Tests.CurrencyConversion;
+namespace Tests.Web.HotelPriceComparisons.CurrencyConversion;
 
 public class CurrencyConverterTests
 {

@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
 
-namespace Tests.HotelPriceComparisons;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison;
 
 public record PriceRecord
 {
     [JsonPropertyName("hotel")]
-    public required string Hotel { get; init; }
+    public required int Hotel { get; init; }
     
     [JsonPropertyName("price")]
     public required decimal Price { get; init; }

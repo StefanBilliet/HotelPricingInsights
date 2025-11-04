@@ -1,4 +1,4 @@
-namespace Tests.PricingExtractsForHotelsInSpecificPeriod;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison;
 
 public sealed record ExtractWindow(
     DateTimeOffset StartUtc,

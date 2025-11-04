@@ -1,9 +1,10 @@
 using System.Data;
 using AutoFixture;
 using Dapper;
+using HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyExchangeRates;
 using Tests.Infrastructure;
 
-namespace Tests.CurrencyExchangeRates;
+namespace Tests.Web.HotelPriceComparisons.CurrencyExchangeRates;
 
 public class MonthAnchoredCurrencyExchangeRatesDataServiceTests
 {

@@ -4,9 +4,11 @@ using AutoFixture.Xunit3;
 using Google.Cloud.Bigtable.Admin.V2;
 using Google.Cloud.Bigtable.V2;
 using Google.Protobuf;
+using HotelPricingInsights.Controllers.HotelPriceComparison;
+using HotelPricingInsights.Controllers.HotelPriceComparison.PricingExtractsForHotelsInSpecificPeriod;
 using Tests.Infrastructure;
 
-namespace Tests.PricingExtractsForHotelsInSpecificPeriod;
+namespace Tests.Web.HotelPriceComparisons.PricingExtractsForHotelsInSpecificPeriod;
 
 public sealed class PricingExtractsForHotelsInSpecificPeriodDataServiceTests : IAsyncLifetime
 {
@@ -16,7 +18,7 @@ public sealed class PricingExtractsForHotelsInSpecificPeriodDataServiceTests : I
     private PricingExtractsForHotelsInSpecificPeriodDataService _sut = null!;
     private Table _ratesTable = null!;
     private const string RatesTableId = "hotel_rates";
-    private const string MariottGhentHotelId = "H101";
+    private const int MariottGhentHotelId = 101;
 
     public PricingExtractsForHotelsInSpecificPeriodDataServiceTests(BigtableEmulatorFixture bigtableEmulatorFixture)
     {
@@ -26,14 +28,14 @@ public sealed class PricingExtractsForHotelsInSpecificPeriodDataServiceTests : I
     }
 
     [Theory, AutoData]
-    public async Task GIVEN_no_extracts_WHEN_Get_THEN_returns_empty_collection(IReadOnlyCollection<string> randomHotelIds,
+    public async Task GIVEN_no_extracts_WHEN_Get_THEN_returns_empty_collection(IReadOnlyCollection<int> randomHotelIds,
         ExtractWindow extractWindow)
     {
         Assert.Empty(await _sut.Get(randomHotelIds, DateOnly.FromDateTime(DateTime.Today), extractWindow, TestContext.Current.CancellationToken));
     }
 
     [Theory, AutoData]
-    public async Task GIVEN_extracts_for_different_hotel_WHEN_Get_THEN_returns_empty_collection(IReadOnlyCollection<string> randomHotelIds,
+    public async Task GIVEN_extracts_for_different_hotel_WHEN_Get_THEN_returns_empty_collection(IReadOnlyCollection<int> randomHotelIds,
         ExtractWindow extractWindow)
     {
         var arrivalDate = new DateTimeOffset(2020, 2, 15, 0, 0, 0, TimeSpan.Zero);

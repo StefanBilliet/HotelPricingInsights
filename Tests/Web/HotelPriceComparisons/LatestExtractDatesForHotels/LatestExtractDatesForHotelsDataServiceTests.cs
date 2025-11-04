@@ -4,7 +4,7 @@ using Google.Cloud.Bigtable.V2;
 using Google.Protobuf;
 using Tests.Infrastructure;
 
-namespace Tests.LatestExtractDatesForHotels;
+namespace Tests.Web.HotelPriceComparisons.LatestExtractDatesForHotels;
 
 public class LatestExtractDatesForHotelsDataServiceTests
 {

@@ -1,6 +1,6 @@
-using Tests.CurrencyExchangeRates;
+using HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyExchangeRates;
 
-namespace Tests.CurrencyConversion;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyConversion;
 
 public interface ICurrencyConverter
 {

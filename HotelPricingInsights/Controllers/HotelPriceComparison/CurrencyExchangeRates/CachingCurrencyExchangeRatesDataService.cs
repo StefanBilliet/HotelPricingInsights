@@ -2,7 +2,7 @@ using System.Globalization;
 using Polly;
 using Polly.Caching;
 
-namespace Tests.CurrencyExchangeRates;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyExchangeRates;
 
 public class CachingCurrencyExchangeRatesDataService : ICurrencyExchangeRatesDataService
 {

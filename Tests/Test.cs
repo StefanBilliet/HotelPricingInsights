@@ -3,6 +3,7 @@ using AutoFixture;
 using Google.Cloud.Bigtable.Admin.V2;
 using Google.Cloud.Bigtable.V2;
 using Google.Protobuf;
+using HotelPricingInsights.Controllers.HotelPriceComparison;
 using Tests.Infrastructure;
 
 namespace Tests;
@@ -13,7 +14,7 @@ public sealed class BigtableIntegrationTests
     private readonly BigtableEmulatorFixture _bigtableEmulatorFixture;
     private readonly BigtableClient _bigtableClient;
     private const string RatesTableId = "hotel_rates";
-    private const string MariottGhentHotelId = "H101";
+    private const int MariottGhentHotelId = 101;
 
     public BigtableIntegrationTests(BigtableEmulatorFixture bigtableEmulatorFixture)
     {

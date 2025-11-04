@@ -1,8 +1,6 @@
-using System.Globalization;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison;
 
-namespace Tests.PricingExtractsForHotelsInSpecificPeriod;
-
-public readonly struct ArrivalDay
+public record ArrivalDay
 {
     public int DaysSinceEpoch { get; }
 
@@ -14,8 +12,7 @@ public readonly struct ArrivalDay
     public DateOnly ToDateOnly() =>
         DateOnly.FromDateTime(DateTimeOffset.UnixEpoch.AddDays(DaysSinceEpoch).UtcDateTime);
 
-    public static ArrivalDay FromDateOnly(DateOnly date) =>
-        new ArrivalDay((int)(date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc) - DateTime.UnixEpoch).TotalDays);
+    public static ArrivalDay FromDateOnly(DateOnly date) => new((int)(date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc) - DateTime.UnixEpoch).TotalDays);
     
     public static ArrivalDay From(DateTimeOffset dateTimeOffset)
     {

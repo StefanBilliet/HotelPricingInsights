@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Tests.HotelPriceComparisons;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison;
 
 public record PricingComparisonResponse
 {

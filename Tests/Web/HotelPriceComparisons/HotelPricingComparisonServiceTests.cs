@@ -1,11 +1,12 @@
 using AutoFixture;
 using AutoFixture.Xunit3;
 using FakeItEasy;
-using Tests.CurrencyConversion;
+using HotelPricingInsights.Controllers.HotelPriceComparison;
+using HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyConversion;
+using HotelPricingInsights.Controllers.HotelPriceComparison.PricingExtractsForHotelsInSpecificPeriod;
 using Tests.Infrastructure;
-using Tests.PricingExtractsForHotelsInSpecificPeriod;
 
-namespace Tests.HotelPriceComparisons;
+namespace Tests.Web.HotelPriceComparisons;
 
 public class HotelPricingComparisonServiceTests
 {
@@ -28,10 +29,10 @@ public class HotelPricingComparisonServiceTests
     public async Task GIVEN_no_extracts_WHEN_GetPricingComparison_THEN_returns_empty_response()
     {
         var result = await _sut.GetPricingComparison(
-            ["123"],
+            [123],
             DateOnly.FromDateTime(DateTime.Today),
             4,
-            "USD",
+            "USD", 
             TestContext.Current.CancellationToken
         );
 
@@ -77,7 +78,7 @@ public class HotelPricingComparisonServiceTests
     }
     
     [Theory, AutoData]
-    public async Task GIVEN_both_current_pricing_and_historical_pricing_WHEN_GetPricingComparison_THEN_returns_response_with_historical_difference_included(string hotelId)
+    public async Task GIVEN_both_current_pricing_and_historical_pricing_WHEN_GetPricingComparison_THEN_returns_response_with_historical_difference_included(int hotelId)
     {
         var arrival = new DateTimeOffset(2020, 2, 15, 0, 0, 0, TimeSpan.Zero);
         var pricingExtractForMariottGhentExtractedOnJanuaryFirstForArrivalOnFebruaryFifteenth = _fixture

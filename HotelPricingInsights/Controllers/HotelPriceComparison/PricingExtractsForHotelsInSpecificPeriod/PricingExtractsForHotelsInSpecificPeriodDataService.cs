@@ -4,11 +4,11 @@ using Google.Cloud.Bigtable.Common.V2;
 using Google.Cloud.Bigtable.V2;
 using Google.Protobuf;
 
-namespace Tests.PricingExtractsForHotelsInSpecificPeriod;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison.PricingExtractsForHotelsInSpecificPeriod;
 
 public interface IPricingExtractsForHotelsInSpecificPeriodDataService
 {
-    Task<IReadOnlyList<PricingExtractForHotel>> Get(IReadOnlyCollection<string> hotelIds,
+    Task<IReadOnlyList<PricingExtractForHotel>> Get(IReadOnlyCollection<int> hotelIds,
         DateOnly monthOfArrivalDates,
         ExtractWindow extractWindow,
         CancellationToken cancellationToken);
@@ -25,7 +25,7 @@ public class PricingExtractsForHotelsInSpecificPeriodDataService : IPricingExtra
         _ratesTable = ratesTable;
     }
 
-    public async Task<IReadOnlyList<PricingExtractForHotel>> Get(IReadOnlyCollection<string> hotelIds,
+    public async Task<IReadOnlyList<PricingExtractForHotel>> Get(IReadOnlyCollection<int> hotelIds,
         DateOnly monthOfArrivalDates,
         ExtractWindow extractWindow,
         CancellationToken cancellationToken)

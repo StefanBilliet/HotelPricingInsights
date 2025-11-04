@@ -1,7 +1,7 @@
 using System.Data;
 using Dapper;
 
-namespace Tests.CurrencyExchangeRates;
+namespace HotelPricingInsights.Controllers.HotelPriceComparison.CurrencyExchangeRates;
 
 public interface ICurrencyExchangeRatesDataService
 {
